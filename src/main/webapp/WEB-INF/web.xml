@@ -31,7 +31,7 @@
     <url-pattern>*.json</url-pattern>
   </servlet-mapping>
   <!-- 配置错误页面 -->
-	<error-page>
+<!-- 	<error-page>
 		<error-code>403</error-code>
 		<location>/WEB-INF/page/portal/403.jsp</location>
 	</error-page>
@@ -42,5 +42,5 @@
 	<error-page>
 		<error-code>500</error-code>
 		<location>/WEB-INF/page/portal/500.jsp</location>
-	</error-page>
+	</error-page> -->
 </web-app>

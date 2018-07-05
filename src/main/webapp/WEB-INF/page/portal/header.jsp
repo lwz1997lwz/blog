@@ -22,9 +22,16 @@
 		</ul>
 		<div id="search" class="hide">
 			<span class="search-field-wrapper form-group"> <input
-				type="text" class="search" placeholder="搜索…" value="" name="">
+				type="text" class="search" placeholder="搜索…" value="" onkeydown="if(event.keyCode==13){searchKeyword(this.value);}">
 			</span> <span id="close-search" class="icon-close" style="font-size: 16px;"></span>
 		</div>
 	</div>
 </div>
-
+<script>
+	function searchKeyword(keyWord){
+		keyWord = keyWord.replace(/(^\s*)|(\s*$)/g, "");
+		if(keyWord!=""){
+			window.location.href="search.action?keyWord="+keyWord;
+		}
+	}
+</script>

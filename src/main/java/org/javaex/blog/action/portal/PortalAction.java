@@ -47,6 +47,25 @@ public class PortalAction {
 		return "portal/index";	
 	}
 	/*
+	 * 前台页面搜索文章
+	 */
+	@RequestMapping("search.action")
+	public String search(ModelMap modelMap ,
+			@RequestParam(value="keyWord") String keyWord,
+			@RequestParam(value="pageNum", defaultValue="1") int pageNum,
+			@RequestParam(value="pageSize", defaultValue="4") int pageSize){
+		HashMap<String, Object> param = new HashMap<String, Object>();
+		param.put("status", 1);
+		param.put("keyWord", keyWord.trim());
+		PageHelper.startPage(pageNum, pageSize);
+		List<ArticleInfo> articlelist= articleInfoService.list(param);
+		//将articlelist放入pageInfo 中的list属性中，可在html中通过${pageInfo.list}遍历获取
+		PageInfo<ArticleInfo> pageInfo = new PageInfo<ArticleInfo>(articlelist);
+		modelMap.put("pageInfo", pageInfo);
+		modelMap.put("keyWord", keyWord);
+		return "portal/search";	
+	}
+	/*
 	 * 根据文章类型查询相应的文章
 	 */
 	@RequestMapping("articleByTypelist.action")
