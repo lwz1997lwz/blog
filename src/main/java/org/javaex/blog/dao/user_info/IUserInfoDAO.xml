@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="org.javaex.blog.dao.user_info.IUserInfoDAO">
+	
+	<!-- 建立sql查询结果字段与实体属性的映射关系 -->
+	<resultMap id="UserInfoMap" type="org.javaex.blog.view.UserInfo">
+		<result column="id" property="id" />
+		<result column="username" property="userName" />
+		<result column="password" property="passWord" />
+	</resultMap>
+	
+	<!-- 校验用户 -->
+	<select id="checkUser" resultMap="UserInfoMap">
+		SELECT
+			*
+		FROM
+			user
+		WHERE
+			1 = 1
+		<if test="userName != null and userName != ''">AND username=#{userName}</if>
+		<if test="passWord != null and passWord != ''">AND password=#{passWord}</if>
+	</select>
+</mapper>

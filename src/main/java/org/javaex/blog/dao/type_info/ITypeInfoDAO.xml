@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="org.javaex.blog.dao.type_info.ITypeInfoDAO">
+	
+	<!-- 建立sql查询结果字段与实体属性的映射关系 -->
+	<resultMap id="TypeInfoMap" type="org.javaex.blog.view.TypeInfo">
+		<result column="id" property="id" />
+		<result column="name" property="name" />
+		<result column="sort" property="sort" />
+	</resultMap>
+	
+	<!-- 查询分类列表 -->
+	<select id="list" resultMap="TypeInfoMap">
+		SELECT
+			*
+		FROM
+			type_info
+        ORDER BY
+            sort
+	</select>
+		<!-- 根据typeId查询分类列表 -->
+	<select id="selectByTypeId" resultMap="TypeInfoMap">
+		SELECT
+			*
+		FROM
+			type_info
+		where
+			id=#{typeId}
+	</select>
+	<!-- 插入分类 -->
+	<insert id="insert">
+		insert into type_info(name,sort) values(#{name},#{sort});
+	</insert>
+	<update id="update" >
+	     update type_info
+		<trim prefix="set" suffixOverrides=",">
+		  <if test="name!=null">name=#{name},</if>
+		  <if test="sort!=null">sort=#{sort},</if>
+ 		</trim>
+ 			WHERE id=#{id}
+	</update>
+	<!-- 批量删除分类 需要注意collection属性 -->
+	<delete id="delete">
+		DELETE FROM type_info WHERE id IN
+		<foreach collection="idArr" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+	
+</mapper>

@@ -1,0 +1,135 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//ibatis.apache.org//DTD Mapper 3.0//EN"
+ "http://ibatis.apache.org/dtd/ibatis-3-mapper.dtd">
+
+<mapper namespace="org.javaex.blog.dao.article_info.IArticleInfoDAO">
+	
+	<!-- 建立sql查询结果字段与实体属性的映射关系 -->
+	<resultMap id="ArticleInfoMap" type="org.javaex.blog.view.ArticleInfo">
+		<result column="id" property="id" />
+		<result column="type_id" property="typeId" />
+		<result column="title" property="title" />
+		<result column="content" property="content" />
+		<result column="content_text" property="contentText" />
+		<result column="cover" property="cover" />
+		<result column="view_count" property="viewCount" />
+		<result column="update_date" property="updateDate" />
+		<result column="status" property="status" />
+		
+		<result column="name" property="name" />
+	</resultMap>
+	<!-- 查询所有文章列表 -->
+	<select id="list" resultMap="ArticleInfoMap">
+		SELECT
+			a.id,
+			a.type_id,
+			t.name,
+			a.title,
+			a.content,
+			a.content_text,
+			a.cover,
+			DATE_FORMAT(a.update_date,'%y-%m-%d') as update_date,
+			a.view_count
+		FROM
+			article_info a,type_info t
+        where
+        	a.type_id=t.id 
+        	<if test="status!=null">AND a.status=#{status}</if>
+        	<if test="typeId!=null">AND a.type_id=#{typeId}</if>
+			<if test="startDate!=null">AND a.update_date between #{startDate} and #{endDate}</if>
+			<if test="keyWord!=null">AND a.title LIKE '%${keyWord}%'</if>
+        order by  a.update_date desc
+	</select>	
+		<!-- 根据id查询文章 -->
+	<select id="selectById" resultMap="ArticleInfoMap">
+		SELECT
+			a.id,
+			a.type_id,
+			t.name,
+			a.title,
+			a.content,
+			a.content_text,
+			a.cover,
+			DATE_FORMAT(a.update_date,'%y-%m-%d') as update_date,
+			a.view_count
+		FROM
+			article_info a,type_info t
+        where
+        	a.type_id=t.id and 
+        	a.id=#{id}
+	</select>
+		<select id="articleContentById" resultMap="ArticleInfoMap">
+		SELECT
+			*
+		FROM
+			article_info
+        where
+        	id=#{articleId}
+	</select>
+			<!-- 根据文章分类查询文章数量(不在回收站中的文章即status=1) -->
+	<select id="countByTypeId" resultType="int">
+		SELECT
+			count(*)
+		FROM
+			article_info
+        where
+        	status = 1 and type_id in   	
+        <foreach collection="typeIdArr" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</select>
+		<!--新增插入文章  -->
+	<insert id="insert">
+	INSERT INTO article_info (type_id,title,content,content_text,cover,view_count,update_date,status)
+	values(#{typeId},#{title},#{content},#{contentText},#{cover},#{viewCount},#{updateDate},#{status})
+	</insert>
+	
+	<update id="update">
+		UPDATE article_info
+		<set>
+			<if test="typeId!=null">type_id=#{typeId},</if>
+			<if test="title!=null">title=#{title},</if>
+			<if test="content!=null">content=#{content},</if>
+			<if test="contentText!=null">content_text=#{contentText},</if>
+			<if test="cover!=null">cover=#{cover},</if>
+			<if test="updateDate!=null">update_date=#{updateDate},</if>
+			<if test="status!=null">status=#{status},</if>
+		</set>
+		WHERE id = #{id}
+	</update>
+	<update id="updateViewCount">
+		update article_info
+		<set>
+			<if test="viewCount!=null">view_count=#{viewCount}</if>
+		</set>
+		where id=#{articleId};
+	</update>
+<!-- 批量删除文章 需要注意collection属性 -->
+	<update id="delete">
+		update  article_info set status = 0 WHERE id IN
+		<foreach collection="idArr" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	<!-- 批量恢复文章 需要注意collection属性 -->
+	<update id="recover">
+		update  article_info set status = 1 WHERE id IN
+		<foreach collection="idArr" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</update>
+	<!-- 用于彻底删除批量文章 需要注意collection属性 -->
+	<delete id="fulldelete">
+		  delete from article_info  WHERE status = 0 and id IN
+		<foreach collection="idArr" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+		<!-- 删除文章分类时删除回收站中的该分类下的所有文章  -->
+	<delete id="deleteByTypeId">
+		  delete from article_info  WHERE status = 0 and type_id IN
+		<foreach collection="typeIdArr" index="index" item="item" open="(" separator="," close=")">
+			#{item}
+		</foreach>
+	</delete>
+</mapper>
